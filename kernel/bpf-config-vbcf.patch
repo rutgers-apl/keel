@@ -1,0 +1,51 @@
+--- a/kernel/bpf/Kconfig	2026-02-22 16:18:59.000000000 -0500
++++ b/kernel/bpf/Kconfig	2026-10-04 19:33:04.238325035 -0400
+@@ -102,3 +102,10 @@
+ 	  If you are unsure how to answer this question, answer N.
+ 
+ endmenu # "BPF subsystem"
++
++config BPF_VBCF
++	bool "Use the verified BCF proof checker (Vbcf)"
++	depends on BPF_SYSCALL
++	help
++	  Replace bcf_checker.c by the checker printed from the Lean
++	  development (kernel/bpf/vbcf.c).
+--- a/kernel/bpf/Makefile	2026-10-04 20:59:23.238249155 -0400
++++ b/kernel/bpf/Makefile	2026-10-04 19:33:04.241150713 -0400
+@@ -6,7 +6,12 @@
+ endif
+ CFLAGS_core.o += -Wno-override-init $(cflags-nogcse-yy)
+ 
+-obj-$(CONFIG_BPF_SYSCALL) += syscall.o verifier.o inode.o helpers.o tnum.o log.o token.o liveness.o bcf_checker.o
++obj-$(CONFIG_BPF_SYSCALL) += syscall.o verifier.o inode.o helpers.o tnum.o log.o token.o liveness.o
++ifeq ($(CONFIG_BPF_VBCF),y)
++obj-$(CONFIG_BPF_SYSCALL) += vbcf_checker.o
++else
++obj-$(CONFIG_BPF_SYSCALL) += bcf_checker.o
++endif
+ obj-$(CONFIG_BPF_SYSCALL) += bpf_iter.o map_iter.o task_iter.o prog_iter.o link_iter.o
+ obj-$(CONFIG_BPF_SYSCALL) += hashtab.o arraymap.o percpu_freelist.o bpf_lru_list.o lpm_trie.o map_in_map.o bloom_filter.o
+ obj-$(CONFIG_BPF_SYSCALL) += local_storage.o queue_stack_maps.o ringbuf.o bpf_insn_array.o
+--- a/kernel/bpf/vbcf_checker.c	1969-12-31 19:00:00.000000000 -0500
++++ b/kernel/bpf/vbcf_checker.c	2026-10-04 19:33:13.689980064 -0400
+@@ -0,0 +1,19 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * The verified BCF proof checker (Vbcf) in place of bcf_checker.c.
++ * vbcf.c is printed from the Lean development and is not edited; this file
++ * only supplies the kernel declarations it uses and BCF's entry point.
++ */
++#include <linux/kernel.h>
++#include <linux/slab.h>
++#include <linux/overflow.h>
++#include <linux/sched.h>
++#include <linux/sched/signal.h>
++#include <linux/bpfptr.h>
++#include <linux/bcf_checker.h>
++
++/* vbcf.c defines the same value (0x0BCF) itself. */
++#undef BCF_MAGIC
++#include "vbcf.c"
++#include "bcf_check_proof.h"
++EXPORT_SYMBOL_GPL(bcf_check_proof);

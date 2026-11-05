@@ -1,0 +1,29 @@
+name = "keel"
+defaultTargets = ["Bcf", "bcfcheck", "EmbC", "Vbcf"]
+
+[[require]]
+name = "compcert-clight-lean"
+git = "https://github.com/Certora/clean.git"
+rev = "123f7f7767e215aceb4821f0d044336d78103ade"
+subDir = "export"
+
+[[lean_lib]]
+name = "Bcf"
+
+[[lean_lib]]
+name = "EmbC"
+
+[[lean_lib]]
+name = "Vbcf"
+
+[[lean_exe]]
+name = "bcfcheck"
+root = "BcfMain"
+
+[[lean_exe]]
+name = "embc_example"
+root = "EmbC.Examples.Main"
+
+[[lean_exe]]
+name = "vbcf"
+root = "Vbcf.Main"

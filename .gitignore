@@ -1,0 +1,7 @@
+.lake/
+EmbC/c/test_vec
+EmbC/c/*.dSYM/
+Vbcf/c/vbcf_c
+Vbcf/c/trace_test
+Vbcf/c/*.dSYM/
+.DS_Store
